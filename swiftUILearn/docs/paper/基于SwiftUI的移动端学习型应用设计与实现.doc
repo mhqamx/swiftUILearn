@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>基于 SwiftUI 的移动端学习型应用设计与实现</title>
+  <style>
+    body { font-family: "Songti SC", "STSong", serif; line-height: 1.8; margin: 36px; }
+    h1, h2, h3 { text-align: center; }
+    h2, h3 { text-align: left; margin-top: 28px; }
+    p { text-indent: 2em; margin: 10px 0; }
+    .center { text-align: center; text-indent: 0; }
+    .noindent { text-indent: 0; }
+  </style>
+</head>
+<body>
+  <h1>基于 SwiftUI 的移动端学习型应用设计与实现</h1>
+  <p class="center">本科课程设计（论文）</p>
+  <p class="center">项目名称：swiftUILearn</p>
+  <p class="center">完成日期：2026年2月14日</p>
+
+  <h2>摘要</h2>
+  <p>随着移动互联网应用形态的持续演进，iOS 开发技术栈正在从传统 UIKit 向声明式框架 SwiftUI 迁移。为了降低初学者学习曲线、提升知识点掌握效率，本文围绕“swiftUILearn”项目，设计并实现了一个集基础知识讲解、交互演示与实战模块于一体的 SwiftUI 学习型应用。系统采用 NavigationSplitView 构建三栏学习结构，按“章节—知识点—演示页面”组织教学内容，并在实战模块中引入 TabBar、MVVM、异步网络请求与错误处理机制，实现从理论到实践的闭环训练。</p>
+  <p>在技术实现层面，本文首先基于 SwiftUI 视图树与状态驱动渲染机制完成教学界面搭建；其次通过 @State、@Binding、@StateObject、@ObservedObject、@EnvironmentObject 等状态管理工具实现数据流治理；再次以 URLSession + async/await 构建通用网络层，使用 APIEndpoint 统一接口定义、APIError 统一异常语义，并通过重试机制增强网络鲁棒性。实验结果表明，系统在功能完整性、代码可维护性与学习路径清晰度方面均达到预期目标，能够有效支撑本科阶段 SwiftUI 课程实践教学。</p>
+  <p>本文最后总结了项目在模块化组织、教学型工程设计与可扩展性方面的经验，并针对后续的离线缓存、自动化测试、组件化与多端协同提出改进方向。研究与实践表明，基于真实工程范式构建教学应用，是提升学生移动端开发能力与工程思维的有效路径。</p>
+  <p class="noindent"><strong>关键词：</strong>SwiftUI；MVVM；iOS；教学型应用；状态管理；网络架构</p>
+
+  <h2>Abstract</h2>
+  <p class="noindent">This thesis presents the design and implementation of a SwiftUI-based educational mobile application named <em>swiftUILearn</em>. The project aims to help undergraduate learners build a complete understanding of modern iOS development through a structured, progressive, and practice-oriented workflow. The system organizes learning content by chapters, lessons, and interactive demos, and further introduces a real-world module with Tab navigation, MVVM architecture, asynchronous networking, and unified error handling. It forms a closed loop from conceptual learning to engineering implementation.</p>
+  <p class="noindent">Technically, the application is built on SwiftUI’s declarative UI paradigm and state-driven rendering model. Core state wrappers are combined to support local state mutation, parent-child data binding, object observation, and cross-view data sharing. The network layer is implemented with URLSession and async/await, while endpoint management and error semantics are standardized through dedicated abstractions. Evaluation indicates that the system delivers good maintainability, clear learning progression, and practical value for undergraduate coursework in mobile development.</p>
+  <p class="noindent"><strong>Key Words:</strong> SwiftUI; MVVM; iOS Development; Educational App; State Management; Network Layer</p>
+
+  <h2>目录</h2>
+  <p class="noindent">第一章 绪论</p>
+  <p class="noindent">第二章 相关技术与理论基础</p>
+  <p class="noindent">第三章 系统需求分析与总体设计</p>
+  <p class="noindent">第四章 系统详细设计与实现</p>
+  <p class="noindent">第五章 系统测试与结果分析</p>
+  <p class="noindent">第六章 总结与展望</p>
+  <p class="noindent">参考文献</p>
+
+  <h2>第一章 绪论</h2>
+  <h3>1.1 研究背景</h3>
+  <p>在传统 iOS 教学场景中，许多课程仍以 UIKit 为主要框架，教学材料往往侧重 API 记忆与页面拼接，缺少对状态驱动思想、现代并发模型以及工程化组织方式的系统训练。随着 Apple 在多个开发者大会中持续强化 SwiftUI 生态，声明式 UI 已成为新一代 iOS 开发的重要方向[1][2]。因此，在本科教学阶段引入 SwiftUI 实践工程，不仅有助于学生掌握新框架，也有助于其建立“数据驱动界面”的思维模式。</p>
+  <p>另一方面，现有学习资料普遍存在“碎片化”问题。初学者往往能在短视频或文档中看到单个控件示例，但难以理解这些知识点在完整应用中的协作关系。尤其在状态管理、页面路由、网络请求和错误处理等关键环节中，若缺少统一项目承载，学生容易形成“会写 Demo、不懂架构”的学习断层。基于该问题，本文选择“swiftUILearn”项目作为研究对象，将基础知识与实战开发融合在一个工程内，形成可持续演进的教学型代码库。</p>
+
+  <h3>1.2 研究目的与意义</h3>
+  <p>本文的核心目标是构建一个符合本科实践教学需求的 SwiftUI 学习应用，并通过完整的软件工程流程验证其可行性。具体而言，一是建立章节化知识体系，将控件、布局、状态、导航、列表、动画、持久化等主题进行循序组织；二是提供可直接运行的交互示例，帮助学习者通过动手操作理解抽象概念；三是在实战模块中落地 MVVM + 网络层架构，使学生在同一项目中同时获得“语法能力”和“工程能力”。</p>
+  <p>从教学价值看，该项目有助于降低 SwiftUI 入门门槛，提高课堂实践效率，并为课程考核提供可观察、可复现实验载体。从工程训练看，项目强调模块边界、职责分离、异步并发、异常治理与可扩展设计，这些能力与企业真实开发场景高度一致。因而，本研究不仅服务于课程作业完成，更可作为后续毕业设计或竞赛项目的基础模板。</p>
+
+  <h3>1.3 国内外研究与应用现状</h3>
+  <p>国外开发社区在 SwiftUI 教学方面起步较早，Apple 官方文档、Human Interface Guidelines 以及大量技术演讲提供了较完整的理论依据[1][3][4]。部分开源项目通过“小而专”的示例展示 SwiftUI 能力，但通常聚焦 UI 表现，较少覆盖可维护网络层与完整业务流程。国内方面，SwiftUI 教学资源近年来增长较快，但不少内容仍停留在“控件清单式讲解”，缺乏工程化组织与统一实践场景。</p>
+  <p>综合现有资料可见，教学型项目需要同时满足“知识覆盖广”“代码结构清晰”“能够实战迁移”三项要求。本文项目在设计上采用双主线策略：一条主线是章节化知识点学习；另一条主线是四 Tab 实战应用。前者保障体系化学习，后者验证知识迁移与综合应用能力，两者共同支撑本科培养目标。</p>
+
+  <h3>1.4 研究内容与论文结构</h3>
+  <p>围绕上述目标，本文主要开展以下工作：第一，完成系统需求分析，明确功能与非功能指标；第二，提出总体架构方案，确定模块划分与数据流方向；第三，基于 SwiftUI 与 MVVM 实现核心功能，重点处理状态同步、网络并发与异常反馈；第四，实施功能测试与结果分析，评估系统在教学场景中的可用性；第五，归纳项目经验并提出改进方向。本文后续章节按“理论—设计—实现—验证—总结”逻辑展开。</p>
+
+  <h2>第二章 相关技术与理论基础</h2>
+  <h3>2.1 SwiftUI 声明式界面模型</h3>
+  <p>SwiftUI 通过声明式语法描述界面状态，开发者关注“界面应当是什么样”，而不是“界面如何一步步被修改”。这种范式将视图更新与数据变化建立直接映射关系，减少手动刷新与状态错位问题[1]。在教学场景中，声明式模型可显著降低学生对生命周期回调和视图层级同步的认知负担，使其更早聚焦于业务数据结构与交互逻辑。</p>
+  <p>本项目在根视图中使用 NavigationSplitView 构建三栏布局，左栏展示章节，中栏展示知识点，右栏展示具体 Demo。该结构直观体现“数据驱动导航”的设计思想：当 selectedChapter 与 selectedLesson 改变时，界面自动重绘并切换内容，无需显式 push/pop 控制代码。通过该方式，学生能够清晰观察状态变化与视图响应之间的关系。</p>
+
+  <h3>2.2 Swift 并发与 async/await</h3>
+  <p>自 Swift 引入结构化并发后，async/await 成为编写异步任务的主流方式。相比回调闭包链式写法，async/await 具备更高可读性和更低心智负担[5]。本项目网络层采用 async/await 实现请求流程，并在首页 ViewModel 中利用 async let 并发加载轮播与推荐数据，体现“并发执行、统一收敛”的实践模式。该设计在教学中可帮助学生理解并发并不等于复杂线程管理，而是可通过语言特性获得更安全、可维护的异步流程。</p>
+  <p>此外，项目在关键 ViewModel 上标注 @MainActor，确保 @Published 属性更新发生在主线程，避免 UI 与数据更新线程不一致导致的异常。该策略兼顾了并发性能与界面安全，是 SwiftUI 应用的基础实践之一。</p>
+
+  <h3>2.3 MVVM 架构思想</h3>
+  <p>MVVM（Model-View-ViewModel）强调展示逻辑与视图描述分离。View 负责声明界面与事件绑定，ViewModel 负责业务流程、数据获取和状态发布，Model 负责数据结构定义[6]。在本项目中，HomeView、MallView、NewsView、MineView 分别对应独立 ViewModel，均通过 @StateObject 创建生命周期受控的观察对象。该模式使页面功能扩展时可以优先修改 ViewModel，减少对 UI 层结构的破坏。</p>
+  <p>与传统 MVC 相比，MVVM 更适合声明式框架。原因在于 SwiftUI 本身已经对 View 与状态做了紧耦合约束，若将业务逻辑继续塞入 View，将快速导致页面代码膨胀。项目通过“可观察状态 + 计算属性 + 异步方法”组合，将复杂逻辑下沉到 ViewModel，使页面层保持可读性，也为后续测试与替换网络实现提供便利。</p>
+
+  <h3>2.4 REST 接口、JSON 解码与错误治理</h3>
+  <p>移动端教学项目若完全使用本地静态数据，难以覆盖真实应用中的接口请求、失败重试与数据解析问题。本文以 JSONPlaceholder 公开接口作为模拟数据源，构建统一 APIEndpoint 枚举维护路径与查询参数，避免 URL 字符串散落在各页面。NetworkManager 采用泛型 request 方法返回 Decodable 类型，借助 JSONDecoder 的 convertFromSnakeCase 策略完成字段映射，降低模型层样板代码。</p>
+  <p>在错误处理方面，项目定义 APIError 枚举统一表达 invalidURL、timeout、networkUnavailable、serverError、decodingFailed 等异常语义，界面通过 ErrorView 进行用户可读反馈。相比直接展示底层错误，这种分层语义化策略更符合工程可维护性，也有助于教学中讲解“错误是业务资产而非杂音”的理念[7]。</p>
+
+  <h3>2.5 教学型软件设计原则</h3>
+  <p>教学型软件不同于纯商业产品，其首要目标是“可学、可改、可复用”。因此，本项目在设计中坚持三项原则：第一，结构可解释，每个文件命名与目录职责明确；第二，示例可独立，每个章节 Demo 尽量减少跨文件隐式依赖；第三，代码可演进，关键层次使用抽象与统一约定降低后续扩展成本。这些原则与软件工程中可读性、模块化、低耦合等经典要求一致[8]，也符合本科教学强调“过程能力”的培养导向。</p>
+
+  <h2>第三章 系统需求分析与总体设计</h2>
+  <h3>3.1 功能需求分析</h3>
+  <p>结合课程实践场景，系统需满足以下功能需求：其一，支持章节化学习，能够按主题展示知识点清单并进入演示页面；其二，支持基础交互体验，如文本输入、按钮点击、开关切换、列表搜索、动画过渡等；其三，支持实战模块，提供首页、商城、新闻、我的四个业务页面；其四，支持网络数据加载、分页、下拉刷新与错误重试；其五，支持基础持久化示例，帮助学习者理解 AppStorage、文件读写与 CoreData 的使用边界。</p>
+  <p>需求设计中特别强调“同构体验”，即学习模块与实战模块需共享一致的编码风格与交互逻辑，使学生在切换场景时能够复用认知。为此，系统在组件层提供 LoadingView、ErrorView、SectionHeader 等通用视图，减少重复实现并突出可复用思维。</p>
+
+  <h3>3.2 非功能需求分析</h3>
+  <p>非功能需求包括易用性、可维护性、可扩展性与运行稳定性。易用性方面，三栏布局应直观表达学习路径，降低导航成本；可维护性方面，目录结构需按模块与职责划分，避免“单文件巨石化”；可扩展性方面，新增章节或接口时应尽量只改一处配置；稳定性方面，网络异常不得导致应用崩溃，需提供可重试和可恢复机制。</p>
+  <p>此外，项目应兼容 iOS 17 及以上环境，利用较新的 SwiftUI 与并发能力提升代码简洁度。考虑课堂设备差异，系统避免引入重量级第三方库，以原生框架实现主要能力，既减少依赖风险，也便于学生理解底层机制。</p>
+
+  <h3>3.3 总体架构设计</h3>
+  <p>系统总体采用“学习主框架 + 实战子系统”双层结构。学习主框架由 ContentView 作为入口，通过 LessonData 注册表管理章节和知识点，实现“配置驱动页面生成”。实战子系统由 ModuleTabView 管理四个业务 Tab，每个 Tab 均对应独立 View 与 ViewModel，底层统一调用 NetworkManager 完成数据获取。该架构兼顾教学展示和工程实践，既能在宏观上体现模块协作，又能在微观上体现具体编码模式。</p>
+  <p>在数据流上，视图层只绑定 ViewModel 发布的状态，不直接操作网络请求；网络层不感知具体页面，仅接收 APIEndpoint 并返回解码结果。通过这种单向依赖，系统避免了循环耦合。若后续替换数据源或增加本地缓存，只需扩展网络层与仓储层即可，不必大规模改动页面逻辑。</p>
+
+  <h3>3.4 模块划分</h3>
+  <p>项目主要分为 App 入口模块、Main 根导航模块、Chapters 教学模块、Modules 实战模块、Core 核心能力模块与 Resources 配置模块。App 入口负责场景初始化；Main 模块负责三栏导航；Chapters 模块按主题提供 Demo；Modules 模块承载业务页面；Core 模块聚合模型、网络与公共组件；Resources 模块负责课程目录注册。该划分遵循“高内聚、低耦合”原则，能够支持多人协作与增量开发。</p>
+
+  <h2>第四章 系统详细设计与实现</h2>
+  <h3>4.1 根容器与学习路径实现</h3>
+  <p>ContentView 是项目最关键的组织节点。其通过 @State 保存当前选中章节与知识点，并交由 NavigationSplitView 分发到左栏、中栏、右栏。左栏 ChapterSidebarView 渲染章节列表，中栏 LessonListView 根据 selectedChapter 动态刷新知识点，右栏则展示 lesson.destination() 对应 Demo。该实现将“学习目录导航”抽象为状态转移问题，避免硬编码页面跳转路径。对学生而言，这是一种非常直观的“以数据组织路由”的范例。</p>
+  <p>LessonData 作为注册表集中维护所有章节，新增知识点时只需在对应章节数组追加 Lesson，即可自动出现在界面中。这种配置化方式提升了课程内容维护效率，也便于教师按学期计划调整教学顺序。相比将导航写死在多个页面中，注册表模式更接近企业配置中心思路，具备良好扩展性。</p>
+
+  <h3>4.2 状态管理机制实现</h3>
+  <p>项目在状态管理上采用分层策略。页面局部交互使用 @State，例如输入框文本、开关状态、选项索引等；父子视图共享可变数据使用 @Binding，实现双向同步；需要跨渲染周期持有对象时使用 @StateObject；外部注入观察对象使用 @ObservedObject。通过这种明确分工，学生能够理解不同属性包装器的语义边界，减少“全部用一个工具”的误用。</p>
+  <p>在实战模块中，HomeViewModel、MallViewModel、NewsViewModel、MineViewModel 均实现为 ObservableObject，内部通过 @Published 发布 isLoading、error、数据列表等状态。View 层仅依据这些状态决定显示 LoadingView、ErrorView 或内容视图，不直接介入业务流程。此举强化了 MVVM 的职责边界，并使 UI 重绘逻辑保持一致性。</p>
+
+  <h3>4.3 网络层设计与实现</h3>
+  <p>NetworkManager 使用单例模式持有 URLSession，并在初始化阶段配置请求超时、资源超时与 waitsForConnectivity 等参数。在 request 泛型方法中，系统依次执行 URL 校验、请求构建、网络调用、HTTP 状态码检查与 JSON 解码，实现了完整且可复用的请求链路。对于 URLError，项目将底层错误映射为业务语义化 APIError，以便上层统一处理。</p>
+  <p>为提升弱网环境体验，项目实现 requestWithRetry 方法，针对可重试错误（如 timeout、networkUnavailable）采用指数退避策略。该策略可减少瞬时故障导致的失败率，也能帮助学生理解“重试并非无脑循环，而应具备节流与边界”。该实现虽然简洁，但已具备企业项目常见网络治理思路。</p>
+
+  <h3>4.4 APIEndpoint 接口抽象</h3>
+  <p>APIEndpoint 采用枚举统一管理 baseURL、path、method 与 queryItems，构建 URL 时通过 URLComponents 进行参数拼接。该方案的优势在于：一处定义、全局可追踪、编译期可约束。比如产品列表接口通过 products(page:limit:) 表达分页意图，新闻列表通过 newsList(page:) 明确参数语义，避免调用层直接拼接字符串带来的维护风险。</p>
+  <p>在教学角度，该抽象帮助学生理解“接口是领域对象而非纯文本”。当接口演进时，开发者只需修改对应 case 的路径与参数策略，上层调用不变。这种稳定性对于中大型项目尤为关键，也能让本科生尽早形成 API 设计意识。</p>
+
+  <h3>4.5 四个实战模块实现</h3>
+  <p>首页模块 HomeView 重点展示综合状态处理能力。页面在初次加载时根据 isLoading 与 error 判断显示占位组件，并在成功后渲染轮播区、快捷入口和推荐列表。通过 refreshable 实现下拉刷新，结合 task 生命周期触发初次加载，形成完整数据闭环。该模块体现了“状态优先于界面”的开发原则。</p>
+  <p>商城模块 MallView + MallViewModel 重点演示分页加载。首次请求获取第一页商品并设置 hasMore，滚动触底后调用 loadMore 追加数据。为避免重复请求，系统通过 isLoadingMore 与 hasMore 双重门禁控制并发与边界，属于典型的移动端分页策略。商品模型中 priceText、shortTitle 等计算属性展示了“展示逻辑靠近模型”的实践方式。</p>
+  <p>新闻模块 NewsView + NewsViewModel 在分页基础上增加搜索能力。项目通过 filteredArticles 计算属性按标题与正文进行本地过滤，并保留原始数据列表作为真源。该设计使搜索逻辑易于理解，也便于后续升级为服务端搜索。模块同时展示了列表渲染、详情跳转与加载更多等常见信息流场景。</p>
+  <p>我的模块 MineView + MineViewModel 通过 userProfile 接口加载用户信息，并以静态菜单配置组织个人中心入口。菜单数据结构 ProfileMenuItem 包含 icon、title、subtitle、action 等字段，满足显示与行为解耦。该模块虽然业务逻辑较轻，但对“数据驱动菜单”与“状态切换（登录/退出）”给出清晰示例。</p>
+
+  <h3>4.6 公共组件与复用策略</h3>
+  <p>项目在 Core/Components 中实现 LoadingView 与 ErrorView，并在多个页面统一复用。LoadingView 负责展示加载状态，ErrorView 负责展示错误信息与重试动作。统一组件不仅减少重复代码，还保证了交互一致性。对于教学项目而言，这种一致性能帮助学生将注意力聚焦在业务差异，而不是反复处理样式细节。</p>
+  <p>此外，SectionHeader、ProductCardView、NewsRowView 等组件体现了“按职责抽取 UI 单元”的思想。组件化不是为了“拆而拆”，而是为了复用、测试和可读性。项目将可重复且语义稳定的界面元素封装为独立视图，有效提升了工程组织质量。</p>
+
+  <h3>4.7 持久化与扩展示例</h3>
+  <p>在第七章教学内容中，项目提供 AppStorage、FileManager、CoreData 三类持久化示例，覆盖轻量配置、文件存储与结构化数据三种典型场景。通过同一工程展示三种机制，学生可对比其复杂度与适用边界：AppStorage 适合偏好设置，FileManager 适合离线文本或资源管理，CoreData 适合关系型本地数据管理[9][10]。</p>
+  <p>该部分虽非实战模块主链路，但对完整课程体系非常关键。移动端应用往往需要“网络 + 本地”混合策略，若仅学习纯网络请求将难以应对离线或弱网环境。通过在教学阶段引入持久化分类认知，可显著提升后续项目设计质量。</p>
+
+  <h2>第五章 系统测试与结果分析</h2>
+  <h3>5.1 测试目标与方法</h3>
+  <p>测试工作围绕功能正确性、交互可用性与代码健壮性展开。功能测试关注章节导航、Demo 交互、四 Tab 模块数据加载与页面跳转是否符合预期；异常测试关注无网络、超时与服务端非 2xx 状态下的错误反馈；边界测试关注分页终止条件、空数据展示与重复触发加载时的并发控制。测试方法采用手工用例 + 代码走查相结合，重点验证教学场景下的稳定体验。</p>
+
+  <h3>5.2 功能测试结果</h3>
+  <p>在学习主框架中，章节切换能够稳定刷新知识点列表，知识点点击可正确加载对应 Demo；在实战模块中，首页轮播与推荐可并发加载，商城与新闻分页逻辑可按页增量更新，“我的”页面用户信息可成功渲染。整体功能链路完整，未出现阻断性崩溃问题。测试说明系统已满足“可展示、可交互、可讲解”的课程交付要求。</p>
+  <p>需要指出的是，项目当前数据源基于 JSONPlaceholder，业务语义为教学模拟，部分字段（如新闻发布时间、阅读数、商品价格）采用计算属性伪造。这种设计符合教学需求，但在生产环境中需替换为真实后端字段，并补充鉴权、埋点、缓存一致性等能力。</p>
+
+  <h3>5.3 异常与鲁棒性分析</h3>
+  <p>当网络不可用或请求超时时，NetworkManager 会抛出 APIError 并由页面层展示 ErrorView，用户可通过重试按钮恢复流程。相比直接忽略失败或崩溃退出，该策略显著提升了交互容错性。对于分页场景，系统在 loadMore 中采取静默失败策略，避免次级错误干扰主流程，符合信息流产品常见体验设计。</p>
+  <p>从代码鲁棒性看，guard 门禁（如 !isLoading、hasMore）可有效避免重复请求；@MainActor 保障状态更新线程安全；统一错误枚举降低了跨页面异常分歧。这些机制共同构成了教学项目可解释、可演进的稳定性基础。</p>
+
+  <h3>5.4 可维护性与扩展性评估</h3>
+  <p>系统目录按模块与职责划分，核心能力集中在 Core 层，界面与业务状态分离，新增功能时具备较小的改动范围。以“新增一个知识点”与“新增一个接口”两类典型任务为例，前者主要修改 LessonData，后者主要扩展 APIEndpoint 与模型定义，均无需侵入全局结构。该结果表明系统具备良好的增量开发特征。</p>
+  <p>不过，项目仍有改进空间。例如，目前尚未系统引入单元测试与 UI 自动化测试；网络层尚未实现缓存策略与请求拦截；依赖注入虽然在初始化参数上已有体现，但尚未形成协议驱动的完整仓储层。上述问题不影响课程展示，但会影响长期迭代效率，应在后续版本重点补齐[11][12]。</p>
+
+  <h2>第六章 总结与展望</h2>
+  <h3>6.1 工作总结</h3>
+  <p>本文围绕 swiftUILearn 项目，完成了一个面向本科教学的 SwiftUI 学习应用设计与实现。项目以“章节化知识体系 + 实战业务模块”双主线组织内容，覆盖基础视图、布局系统、状态管理、导航路由、列表处理、动画过渡、数据持久化以及网络请求等关键主题。在工程实现上，系统采用 MVVM 架构、统一网络层与错误治理策略，保证了代码结构清晰、逻辑边界明确与交互流程完整。</p>
+  <p>从实践效果看，项目能够有效承载课程讲解、课后练习与能力评估。学生不仅可以通过可视化 Demo 快速理解概念，还可以在实战模块中观察多页面协作、分页、刷新、异常恢复等真实开发问题。该成果验证了教学型工程在“知识内化”与“工程迁移”上的双重价值。</p>
+
+  <h3>6.2 存在不足</h3>
+  <p>尽管项目已达到课程设计预期，但仍存在若干不足。首先，测试体系以手工验证为主，缺少覆盖关键逻辑的自动化测试；其次，接口数据为公开模拟源，尚未包含认证授权、请求签名与复杂业务规则；再次，持久化内容多为演示级示例，尚未建立统一数据仓储以支撑离线优先策略。上述不足意味着项目更适合作为教学起点，而非直接用于生产环境。</p>
+
+  <h3>6.3 未来展望</h3>
+  <p>未来工作可从三个方向推进：第一，完善工程质量体系，引入 XCTest、快照测试与持续集成流程，提升回归效率；第二，扩展架构能力，引入 Repository 层与协议化依赖注入，增强可测试性与可替换性；第三，升级教学表达，结合可视化流程图与在线文档，为每个章节提供“概念—代码—实验—思考”四段式学习卡片，进一步提升自学友好度。</p>
+  <p>综合来看，SwiftUI 作为现代 iOS 开发框架，正在推动教学范式从“控件教学”转向“状态与架构教学”。本项目的实践表明，若能将真实工程方法融入课堂项目，学生在学习阶段就能形成较强的问题拆解能力与代码治理意识。这正是本科软件工程教育应持续追求的核心目标。</p>
+
+  <h2>致谢</h2>
+  <p>本项目完成过程中，感谢指导教师在选题方向、架构设计与写作规范方面提供的细致建议；感谢同学在测试反馈与界面体验方面给予的帮助；也感谢 Apple 官方文档与开发者社区提供的大量公开资料，为本文研究与实践提供了重要参考。通过本次课程设计，我对 SwiftUI 工程化开发有了更系统的理解，也更加认识到规范设计与持续迭代在软件开发中的价值。</p>
+
+  <h2>参考文献</h2>
+  <p class="noindent">[1] Apple Inc. SwiftUI Documentation[EB/OL]. https://developer.apple.com/documentation/swiftui, 2026-02-14.</p>
+  <p class="noindent">[2] Apple Inc. Develop Apps for Apple Platforms[EB/OL]. https://developer.apple.com/tutorials/app-dev-training, 2026-02-14.</p>
+  <p class="noindent">[3] Apple Inc. Human Interface Guidelines[EB/OL]. https://developer.apple.com/design/human-interface-guidelines, 2026-02-14.</p>
+  <p class="noindent">[4] Apple Inc. WWDC Sessions: SwiftUI Essentials[EB/OL]. https://developer.apple.com/videos/swiftui-ui-framework/, 2026-02-14.</p>
+  <p class="noindent">[5] Apple Inc. Swift Concurrency[EB/OL]. https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency, 2026-02-14.</p>
+  <p class="noindent">[6] Fowler M. GUI Architectures[EB/OL]. https://martinfowler.com/eaaDev/uiArchs.html, 2026-02-14.</p>
+  <p class="noindent">[7] Kleppmann M. Designing Data-Intensive Applications[M]. Sebastopol: O'Reilly Media, 2017.</p>
+  <p class="noindent">[8] Martin R C. Clean Architecture[M]. Boston: Prentice Hall, 2017.</p>
+  <p class="noindent">[9] Apple Inc. AppStorage[EB/OL]. https://developer.apple.com/documentation/swiftui/appstorage, 2026-02-14.</p>
+  <p class="noindent">[10] Apple Inc. Core Data Programming Guide[EB/OL]. https://developer.apple.com/documentation/coredata, 2026-02-14.</p>
+  <p class="noindent">[11] Apple Inc. XCTest Documentation[EB/OL]. https://developer.apple.com/documentation/xctest, 2026-02-14.</p>
+  <p class="noindent">[12] Beck K. Test Driven Development: By Example[M]. Boston: Addison-Wesley, 2003.</p>
+
+</body>
+</html>
