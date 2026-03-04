@@ -10,9 +10,9 @@ import SwiftUI
 
 struct ContentView: View {
     // 当前选中的章节（左栏 → 中栏）
-    @State private var selectedChapter: Chapter? = LessonData.chapters.first
+    @State private var selectedChapter: Chapter?
     // 当前选中的知识点（中栏 → 右栏）
-    @State private var selectedLesson: Lesson? = LessonData.chapters.first?.lessons.first
+    @State private var selectedLesson: Lesson?
 
     var body: some View {
         NavigationSplitView {
