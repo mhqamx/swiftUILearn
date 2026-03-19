@@ -19,7 +19,8 @@ struct LessonData {
         chapter05_List,
         chapter06_Animation,
         chapter07_Persistence,
-        chapter08_RealWorld
+        chapter08_Network,
+        chapter09_RealWorld
     ]
 }
 
@@ -140,8 +141,19 @@ private let chapter07_Persistence = Chapter(
     ]
 )
 
-// MARK: - 第八章：实战模块（TabBar + 网络请求）
-private let chapter08_RealWorld = Chapter(
+// MARK: - 第八章：网络请求
+private let chapter08_Network = Chapter(
+    title: "网络请求",
+    icon: "network",
+    color: .cyan,
+    lessons: [
+        Lesson(title: "URLSession + async/await", description: "现代 Swift 并发网络请求",
+               icon: "arrow.down.circle") { AnyView(NetworkRequestDemoView()) }
+    ]
+)
+
+// MARK: - 第九章：实战模块（TabBar + 网络请求）
+private let chapter09_RealWorld = Chapter(
     title: "实战模块",
     icon: "hammer.fill",
     color: .indigo,

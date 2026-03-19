@@ -68,7 +68,7 @@ struct FileManagerDemoView: View {
     @State private var books: [SimpleBook] = []
     @State private var newTitle = ""
     @State private var newAuthor = ""
-    @State private var statusMessage = ""
+    @State public var statusMessage = ""
     @State private var fileSize: Int64 = 0
 
     var body: some View {
@@ -132,11 +132,12 @@ struct FileManagerDemoView: View {
                             }
                             .buttonStyle(.bordered)
                         }
-
                         if !statusMessage.isEmpty {
                             Text(statusMessage)
                                 .font(.caption)
                                 .foregroundStyle(.green)
+                        } else {
+                            Text("6666").font(.caption).foregroundStyle(.secondary)  // 占位符，保持布局稳定
                         }
                     }
                     .padding(8)
