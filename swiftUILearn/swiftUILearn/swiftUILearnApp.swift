@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct swiftUILearnApp: App {
@@ -13,6 +14,7 @@ struct swiftUILearnApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [SwiftDataBook.self])
     }
 }
 

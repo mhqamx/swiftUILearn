@@ -19,6 +19,9 @@ dirs_to_add = {
   'Chapters/05_List'   => Dir.glob("#{SOURCE_ROOT}/Chapters/05_List/*.swift").map { |f| f.sub("#{SOURCE_ROOT}/", '') },
   'Chapters/06_Animation' => Dir.glob("#{SOURCE_ROOT}/Chapters/06_Animation/*.swift").map { |f| f.sub("#{SOURCE_ROOT}/", '') },
   'Chapters/07_Persistence' => Dir.glob("#{SOURCE_ROOT}/Chapters/07_Persistence/*.swift").map { |f| f.sub("#{SOURCE_ROOT}/", '') },
+  'Chapters/08_Network' => Dir.glob("#{SOURCE_ROOT}/Chapters/08_Network/*.swift").map { |f| f.sub("#{SOURCE_ROOT}/", '') },
+  'Chapters/09_Controls' => Dir.glob("#{SOURCE_ROOT}/Chapters/09_Controls/*.swift").map { |f| f.sub("#{SOURCE_ROOT}/", '') },
+  'Chapters/10_Graphics' => Dir.glob("#{SOURCE_ROOT}/Chapters/10_Graphics/*.swift").map { |f| f.sub("#{SOURCE_ROOT}/", '') },
 }
 
 # 移除旧的 ContentView（将用新的替换）
